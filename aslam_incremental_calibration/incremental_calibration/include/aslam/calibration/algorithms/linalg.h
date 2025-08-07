@@ -28,6 +28,7 @@
 #include <limits>
 
 #include <Eigen/Core>
+#include <SuiteSparseQR.hpp>
 
 struct cholmod_sparse_struct;
 typedef cholmod_sparse_struct cholmod_sparse;
@@ -35,7 +36,7 @@ struct cholmod_dense_struct;
 typedef cholmod_dense_struct cholmod_dense;
 struct cholmod_common_struct;
 typedef cholmod_common_struct cholmod_common;
-template <typename Entry> struct SuiteSparseQR_factorization;
+//template <typename Entry, typename Int = int64_t> struct SuiteSparseQR_factorization;
 
 namespace aslam {
   namespace calibration {

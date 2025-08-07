@@ -26,7 +26,7 @@
 
 #include <cholmod.h>
 #include <SuiteSparseQR.hpp>
-#include <spqr.hpp>
+//#include <spqr.hpp>
 
 #include "aslam/calibration/exceptions/OutOfBoundException.h"
 #include "aslam/calibration/exceptions/InvalidOperationException.h"
@@ -38,6 +38,22 @@ namespace aslam {
 /******************************************************************************/
 /* Methods                                                                    */
 /******************************************************************************/
+
+
+double max_col_norm(cholmod_sparse* A) {
+    double maxNorm = 0.0;
+    for (size_t j = 0; j < A->ncol; ++j) {
+        double norm = 0.0;
+        size_t col_start = ((size_t*)(A->p))[j];
+        size_t col_end   = ((size_t*)(A->p))[j + 1];
+        for (size_t i = col_start; i < col_end; ++i) {
+            double val = ((double*)(A->x))[i];
+            norm += val * val;
+        }
+        maxNorm = std::max(maxNorm, std::sqrt(norm));
+    }
+    return maxNorm;
+}
 
     cholmod_sparse* columnSubmatrix(cholmod_sparse* A, std::ptrdiff_t
         colStartIdx, std::ptrdiff_t colEndIdx, cholmod_common* cholmod) {
@@ -269,7 +285,7 @@ namespace aslam {
         throw NullPointerException("cholmod", __FILE__, __LINE__,
           __PRETTY_FUNCTION__);
       return 20.0 * static_cast<double>(A->nrow + A->ncol) * eps *
-        spqr_maxcolnorm<double>(A, cholmod);
+        max_col_norm(A);
     }
 
     double svGap(const Eigen::VectorXd& sv, std::ptrdiff_t rank) {

@@ -1,8 +1,7 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.5)
 project(numpy_eigen)
 
-set(CMAKE_CXX_STANDARD 14)
-
+#set(CMAKE_CXX_STANDARD 14)
 find_package(catkin REQUIRED COMPONENTS python_module)
 find_package(Boost REQUIRED COMPONENTS system)
 find_package(Eigen3 REQUIRED)

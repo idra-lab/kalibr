@@ -445,8 +445,32 @@ namespace aslam {
     template<typename I>
     void Cholmod<I>::getR(cholmod_sparse* A, cholmod_sparse** R) {
       cholmod_sparse* qrJ = cholmod_l_transpose(A, 1, &_cholmod);
-      SuiteSparseQR<double>(SPQR_ORDERING_FIXED, SPQR_NO_TOL, qrJ->ncol, 0,
-        qrJ, NULL, NULL, NULL, NULL, R, NULL, NULL, NULL, NULL, &_cholmod);
+      cholmod_sparse* Q = nullptr;
+cholmod_dense* R_dense = nullptr;
+cholmod_sparse* E2 = nullptr;
+int64_t* parent = nullptr;        // or int*, depends on your SuiteSparse build
+cholmod_sparse* C = nullptr;
+int64_t* colptr = nullptr;
+cholmod_dense* D = nullptr;
+
+SuiteSparseQR<double, int64_t>(
+    SPQR_ORDERING_FIXED, SPQR_NO_TOL,
+    qrJ->nrow, qrJ->ncol,     // m, n
+    qrJ,                      // A
+    nullptr,                  // E (elimination tree)
+    nullptr,                  // b (right-hand side)
+    &Q,                       // Q
+    &R_dense,                 // R (dense)
+    &E2,                      // E2
+    &parent,                  // parent vector
+    &C,                       // C
+    &colptr,                  // colptr
+    &D,                       // D
+    &_cholmod                // cholmod common
+);
+
+  //    SuiteSparseQR<double>(SPQR_ORDERING_FIXED, SPQR_NO_TOL, qrJ->ncol, 0,
+    //    qrJ, nullptr, nullptr, nullptr, nullptr, R, nullptr, nullptr, nullptr, nullptr, &_cholmod);
       SM_ASSERT_EQ(Exception, _cholmod.status, CHOLMOD_OK,
         "QR factorization failed");
       CholmodIndexTraits<index_t>::free_sparse(&qrJ, &_cholmod);
